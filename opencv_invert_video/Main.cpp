@@ -24,8 +24,6 @@ int main(int argc, char** argv) {
 	while (true) {
 		capture >> frame;
 
-
-
 		if (frame.empty()) {
 			break;
 		}
@@ -49,9 +47,9 @@ int main(int argc, char** argv) {
 
 Mat* invertFrame(Mat originalFrame) {
 	Mat* invertedFrame = new Mat(originalFrame.rows, originalFrame.cols, originalFrame.type());
-	cout << originalFrame.cols + originalFrame.rows << endl;
+	//cout << originalFrame.cols + originalFrame.rows << endl;
 	for (int i = 0; i < originalFrame.rows; i++) {
-		for (int j = 0; j < 1280; j++) {
+		for (int j = 0; j < originalFrame.cols * 3; j++) {
 			(invertedFrame)->at<unsigned char>(i, j) = 255 - (unsigned int)originalFrame.at<unsigned char>(i, j);
 		}
 	}
