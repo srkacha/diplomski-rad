@@ -10,6 +10,9 @@ int DETECTION_RECT_DIM = 6;
 int MV_TRESH = 20;
 float MV_DETECTION_TRESH = 0.5;
 
+int MACRO_BLOCK_DIM = 16;
+int MACRO_BLOCK_P = 7;
+
 
 //functions
 VideoWriter* generateWriter(VideoCapture, string);
@@ -18,6 +21,7 @@ Mat* generateFrameDifference(Mat, Mat);
 Mat* generateBinaryDifference(Mat, int);
 Mat drawMotionRects(Mat , Mat );
 void drawRectOnFrame(Mat*, int, int, int, int);
+Mat generateMotionVectorMatrix(Mat, Mat);
 
 int main() {
 	VideoCapture capture("video/chaplin.mp4");
@@ -132,4 +136,20 @@ void drawRectOnFrame(Mat* frame, int blockRow, int blockCol, int height, int wid
 			}
 		}
 	}
+}
+
+Mat generateMotionVectorMatrix(Mat currentFrame, Mat prevFrame) {
+	int vectorDim = 2;
+	int matrixRows = currentFrame.rows;
+	int matrixCols = currentFrame.cols;
+	int type = 0;
+	const int matSize[] = { matrixRows, matrixCols, vectorDim };
+	Mat motionVectorMatrix(3, matSize, type);
+
+	//iterating through the frame macro blocks
+	int blockRows = matrixRows / MACRO_BLOCK_DIM;
+	int blockCols = matrixCols / MACRO_BLOCK_DIM;
+	//for(int i = 0; i < )
+
+	return motionVectorMatrix;
 }
