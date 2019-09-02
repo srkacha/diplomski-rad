@@ -2,14 +2,16 @@
 #include <stdio.h>
 #include <string.h>
 
+void printMat(unsigned char*** mat);
+
 int main(int argc, char** argv) {
-	unsigned char* currentFrame = allocateSpaceForFrame(1280, 720, 3);
-	unsigned char* prevFrame = allocateSpaceForFrame(1280, 720, 3);
+	unsigned char* currentFrame = allocateSpaceForFrame(VIDEO_W, VIDEO_H, 3);
+	unsigned char* prevFrame = allocateSpaceForFrame(VIDEO_W, VIDEO_H, 3);
 	int firstFrameReading = 1;
 	long count;
 
-	FILE* pipein = _popen("ffmpeg -i video/teapot.mp4 -f image2pipe -vcodec rawvideo -pix_fmt rgb24 -", "rb");
-	FILE* pipeout = _popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 1280x720 -r 25 -i - -f mp4 -q:v 5 -an -vcodec mpeg4 video/output.mp4", "wb");
+	FILE* pipein = _popen("ffmpeg -i video/input.mp4 -f image2pipe -vcodec rawvideo -pix_fmt rgb24 -", "rb");
+	FILE* pipeout = _popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 640x360 -r 25 -i - -f mp4 -q:v 5 -an -vcodec mpeg4 video/output.mp4", "wb");
 	
 	unsigned char*** motionVectorMatrix;
 
@@ -29,7 +31,8 @@ int main(int argc, char** argv) {
 
 			// Process this frame
 			motionVectorMatrix = calculateMotionVectorMatrix(VIDEO_W, VIDEO_H, 3, currentFrame, prevFrame);
-			printf("\n%d %d\n", motionVectorMatrix[0][0][0],motionVectorMatrix[0][0][1]);
+			drawRectangles(VIDEO_W, VIDEO_H, currentFrame, motionVectorMatrix, MOVEMENT_TRESH);
+			//printMat(motionVectorMatrix);
 
 			// Write this frame to the output pipe
 			fwrite(currentFrame, 1, VIDEO_H * VIDEO_W * 3, pipeout);
@@ -46,4 +49,17 @@ int main(int argc, char** argv) {
 	_pclose(pipeout);
 
 	return 0;
+}
+
+void printMat(unsigned char*** mat) {
+	for (int i = 0; i < VIDEO_H / MACRO_BLOCK_DIM; i++) {
+		for (int j = 0; j<VIDEO_W / MACRO_BLOCK_DIM; j++) {
+			if (mat[i][j][0] + mat[i][j][1] > MOVEMENT_TRESH) {
+				printf("1");
+			}
+			else printf("0");
+		}
+		printf("\n");
+	}
+	printf("\n");
 }
