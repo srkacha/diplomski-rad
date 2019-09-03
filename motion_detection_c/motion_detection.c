@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-unsigned char* calculateMotionVectorMatrix(int video_w, int video_h, int channels, unsigned char* currentFrame, unsigned char* prevFrame){
-	unsigned char*** mvm = allocateSpaceForMVM(video_w, video_h);
+char* calculateMotionVectorMatrix(int video_w, int video_h, int channels, unsigned char* currentFrame, unsigned char* prevFrame){
+	char*** mvm = allocateSpaceForMVM(video_w, video_h);
 	int result = 0;
 
 	//if the video frames are grayscale
@@ -27,16 +27,16 @@ unsigned char* allocateSpaceForFrame(int frame_w, int frame_h, int channels) {
 }
 
 
-unsigned char*** allocateSpaceForMVM(int video_w, int video_h) {
+char*** allocateSpaceForMVM(int video_w, int video_h) {
 	//alocating rows
-	unsigned char*** mvm = (unsigned char***)calloc((video_h / MACRO_BLOCK_DIM), sizeof(unsigned char**));
+	 char*** mvm = ( char***)calloc((video_h / MACRO_BLOCK_DIM), sizeof( char**));
 	
 	//alocating cols
 	for (int i = 0; i < video_h/MACRO_BLOCK_DIM; i++) {
-		mvm[i] = (unsigned char**)calloc((video_w / MACRO_BLOCK_DIM), sizeof(unsigned char*));
+		mvm[i] = ( char**)calloc((video_w / MACRO_BLOCK_DIM), sizeof( char*));
 		//alocating channels
 		for (int j = 0; j < video_w / MACRO_BLOCK_DIM; j++) {
-			mvm[i][j] = (unsigned char*)calloc(2, sizeof(unsigned char));
+			mvm[i][j] = ( char*)calloc(2, sizeof( char));
 		}
 	}
 
@@ -56,8 +56,11 @@ int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* curr
 			int offset_y = 0;
 			//todo: make if cases for optimization algs
 			calculateBlockOffsetExhaustive(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
-			mvm[i][j][0] = offset_x;
-			mvm[i][j][1] = offset_y;
+			
+			mvm[i][j][0] = offset_y;
+			mvm[i][j][1] = offset_x;
+
+			if (abs(mvm[i][j][0] + mvm[i][j][1]) > MOVEMENT_TRESH) printf("\n%d %d\n", offset_x, offset_y);
 		}
 	}
 
@@ -111,10 +114,10 @@ void calculateBlockOffsetExhaustive(int video_w, int video_h, unsigned char* cur
 	*offset_y = min_diff_row_offset;
 }
 
-void drawRectangles(int frame_w, int frame_h, unsigned char* frame, unsigned char*** motionMatrix, float movement_tresh) {
+void drawRectangles(int frame_w, int frame_h, unsigned char* frame, char*** motionMatrix, float movement_tresh) {
 	for (int i = 0; i < frame_h / MACRO_BLOCK_DIM; i++) {
 		for (int j = 0; j < frame_w / MACRO_BLOCK_DIM; j++) {
-			int distance = motionMatrix[i][j][0] + motionMatrix[i][j][1];
+			int distance = abs(motionMatrix[i][j][0] + motionMatrix[i][j][1]);
 			if (distance > movement_tresh) {
 				drawRectOnBlock(frame_w, frame_h, i, j, frame);
 			}
@@ -124,16 +127,16 @@ void drawRectangles(int frame_w, int frame_h, unsigned char* frame, unsigned cha
 
 void drawRectOnBlock(int frame_w, int frame_h, int block_row, int block_col, unsigned char* frame) {
 	int rect_dim = MACRO_BLOCK_DIM / 2;
-	int start_row = block_row * MACRO_BLOCK_DIM + ((MACRO_BLOCK_DIM - rect_dim) / 2);
-	int start_col = (block_col * MACRO_BLOCK_DIM + ((MACRO_BLOCK_DIM - rect_dim) / 2)) * 3;
+	int start_row = block_row * MACRO_BLOCK_DIM + (MACRO_BLOCK_DIM - rect_dim) / 2;
+	int start_col = block_col * MACRO_BLOCK_DIM + (MACRO_BLOCK_DIM - rect_dim) / 2;
 	for (int i = start_row; i < start_row + rect_dim; i++) {
-		for (int j = start_col; j < start_col + rect_dim * 3; j++) {
+		for (int j = start_col; j < start_col + rect_dim ; j++) {
 			if (i == start_row || i == start_row + rect_dim - 1) {
 				frame[i * frame_w * 3 + j * 3 + 0] = 0;
 				frame[i * frame_w * 3 + j * 3 + 1] = 255;
 				frame[i * frame_w * 3 + j * 3 + 2] = 0;
 			}
-			else if (j == start_col || j == start_col + rect_dim * 3 - 2) {
+			else if (j == start_col || j == start_col + rect_dim - 1) {
 				frame[i * frame_w * 3 + j * 3 + 0] = 0;
 				frame[i * frame_w * 3 + j * 3 + 1] = 255;
 				frame[i * frame_w * 3 + j * 3 + 2] = 0;

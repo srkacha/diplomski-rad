@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 	FILE* pipein = _popen("ffmpeg -i video/input.mp4 -f image2pipe -vcodec rawvideo -pix_fmt rgb24 -", "rb");
 	FILE* pipeout = _popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 640x360 -r 25 -i - -f mp4 -q:v 5 -an -vcodec mpeg4 video/output.mp4", "wb");
 	
-	unsigned char*** motionVectorMatrix;
+	char*** motionVectorMatrix;
 
 	// Process video frames
 	while (1)

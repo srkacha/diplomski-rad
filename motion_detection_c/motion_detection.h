@@ -5,11 +5,11 @@
 #define VIDEO_H 360
 
 #define MACRO_BLOCK_DIM 16
-#define SEARCH_WINDOW_P 4
+#define SEARCH_WINDOW_P 7
 
 //distance is based on the manhathan distance, that's the sum of x and y offsets
-#define MOVEMENT_TRESH 200
-#define BLOCK_DIFF_TRESH 20
+#define MOVEMENT_TRESH 5
+#define BLOCK_DIFF_TRESH 10
 
 /*
 All the functions expect a one dimensional representation of a frame for more optimal operations
@@ -19,12 +19,12 @@ All the functions expect a one dimensional representation of a frame for more op
 Takes two consecutive frames as input
 Returns motion vector matrix calcualted for the input frames
 */
-unsigned char* calculateMotionVectorMatrix(int video_w, int video_h, int channels, unsigned char* currentFrame, unsigned char* prevFrame);
+char* calculateMotionVectorMatrix(int video_w, int video_h, int channels, unsigned char* currentFrame, unsigned char* prevFrame);
 
 /*
 Allocates space for the output motion vector matrix
 */
-unsigned char*** allocateSpaceForMVM(int video_w, int video_h);
+char*** allocateSpaceForMVM(int video_w, int video_h);
 
 /*
 Helper function for calculating mvm for 1 channel video (grayscale)
@@ -51,7 +51,7 @@ unsigned char* allocateSpaceForFrame(int frame_w, int frame_h, int channels);
 /*
 Draw squares over macroblocks that we suppose are moving
 */
-void drawRectangles(int frame_w, int frame_h, unsigned char* frame, unsigned char*** motionMatrix, float movement_tresh);
+void drawRectangles(int frame_w, int frame_h, unsigned char* frame, char*** motionMatrix, float movement_tresh);
 
 /*
 Helper function for drawing rects
