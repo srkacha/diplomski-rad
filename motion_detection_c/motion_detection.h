@@ -1,15 +1,15 @@
 #ifndef MOTION_DETECTION
 #define	MOTION_DETECTION
 
-#define VIDEO_W 640
-#define VIDEO_H 360
+#define VIDEO_W 1280
+#define VIDEO_H 720
 
 #define MACRO_BLOCK_DIM 16
 #define SEARCH_WINDOW_P 7
 
 //distance is based on the manhathan distance, that's the sum of x and y offsets
-#define MOVEMENT_TRESH 5
-#define BLOCK_DIFF_TRESH 10
+#define MOVEMENT_TRESH 1
+#define BLOCK_DIFF_TRESH 1000
 
 /*
 All the functions expect a one dimensional representation of a frame for more optimal operations
@@ -41,7 +41,7 @@ int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* curr
 /*
 Calculating the offset for the given block on the current frame based on its position on the prev frame
 */
-void calculateBlockOffsetExhaustive(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, int* offset_x, int* offset_y);
+void calculateBlockOffsetExhaustive(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y);
 
 /*
 Allocate space for a frame
@@ -58,6 +58,6 @@ Helper function for drawing rects
 */
 void drawRectOnBlock(int frame_w, int frame_h, int block_row, int block_col, unsigned char* frame);
 
-int blockDidMove(int frame_w, int frame_h, int block_row, int block_col, char* current_frame, char* prev_frame);
+int blockDidMove(int frame_w, int frame_h, int block_row, int block_col,unsigned char* current_frame,unsigned char* prev_frame);
 
 #endif
