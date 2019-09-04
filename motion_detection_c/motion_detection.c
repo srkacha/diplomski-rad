@@ -246,3 +246,21 @@ int blockDidMove(int frame_w, int frame_h, int block_row, int block_col, unsigne
 	}
 }
 
+void colorMacroBlocks(int frame_w, int frame_h, unsigned char* frame, char*** motionMatrix) {
+	int distance = 0;
+	unsigned char color = 0;
+	for (int i = 0; i < frame_h / MACRO_BLOCK_DIM; i++) {
+		for (int j = 0; j < frame_w / MACRO_BLOCK_DIM; j++) {
+			distance = abs(motionMatrix[i][j][0]) + abs(motionMatrix[i][j][1]);
+			color = distance * (255 / (SEARCH_WINDOW_P * 2));
+			for (int k = 0; k < MACRO_BLOCK_DIM; k++) {
+				for (int p = 0; p < MACRO_BLOCK_DIM; p++) {
+					frame[frame_w * 3 * (i * MACRO_BLOCK_DIM + k) + j * MACRO_BLOCK_DIM * 3 + p * 3 + 0] = color;
+					frame[frame_w * 3 * (i * MACRO_BLOCK_DIM + k) + j * MACRO_BLOCK_DIM * 3 + p * 3 + 1] = color;
+					frame[frame_w * 3 * (i * MACRO_BLOCK_DIM + k) + j * MACRO_BLOCK_DIM * 3 + p * 3 + 2] = color;
+				}
+			}
+		}
+	}
+}
+

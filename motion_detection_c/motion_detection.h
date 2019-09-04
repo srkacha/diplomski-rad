@@ -77,6 +77,14 @@ Helper function for drawing rects
 */
 void drawRectOnBlock(int frame_w, int frame_h, int block_row, int block_col, unsigned char* frame);
 
+/*
+Optimization method that checks if the given blocks are the same block or not 
+*/
 int blockDidMove(int frame_w, int frame_h, int block_row, int block_col,unsigned char* current_frame,unsigned char* prev_frame);
+
+/*
+Visualisation method to color the frame based on the movemen of the macro blocks
+*/
+void colorMacroBlocks(int frame_w, int frame_h, unsigned char* frame, char*** motionMatrix);
 
 #endif
