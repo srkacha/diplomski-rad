@@ -4,8 +4,8 @@
 #define VIDEO_W 1920
 #define VIDEO_H 1080
 
-#define MACRO_BLOCK_DIM 8
-#define SEARCH_WINDOW_P 3
+#define MACRO_BLOCK_DIM 16
+#define SEARCH_WINDOW_P 7
 
 //distance is based on the manhathan distance, that's the sum of x and y offsets
 #define MOVEMENT_TRESH 1
@@ -86,5 +86,10 @@ int blockDidMove(int frame_w, int frame_h, int block_row, int block_col,unsigned
 Visualisation method to color the frame based on the movemen of the macro blocks
 */
 void colorMacroBlocks(int frame_w, int frame_h, unsigned char* frame, char*** motionMatrix);
+
+/*
+Visualisation method to color the frame based on the movemen of the macro blocks, in reed and blue
+*/
+void colorMacroBlocksRB(int frame_w, int frame_h, unsigned char* frame, char*** motionMatrix);
 
 #endif

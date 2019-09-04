@@ -264,3 +264,21 @@ void colorMacroBlocks(int frame_w, int frame_h, unsigned char* frame, char*** mo
 	}
 }
 
+void colorMacroBlocksRB(int frame_w, int frame_h, unsigned char* frame, char*** motionMatrix) {
+	unsigned char color_r = 0;
+	unsigned char color_b = 0;
+	for (int i = 0; i < frame_h / MACRO_BLOCK_DIM; i++) {
+		for (int j = 0; j < frame_w / MACRO_BLOCK_DIM; j++) {
+			color_r = abs(motionMatrix[i][j][0]) * (255 / (SEARCH_WINDOW_P * 2));
+			color_b = abs(motionMatrix[i][j][1]) * (255 / (SEARCH_WINDOW_P * 2));
+			for (int k = 0; k < MACRO_BLOCK_DIM; k++) {
+				for (int p = 0; p < MACRO_BLOCK_DIM; p++) {
+					frame[frame_w * 3 * (i * MACRO_BLOCK_DIM + k) + j * MACRO_BLOCK_DIM * 3 + p * 3 + 0] = color_r;
+					frame[frame_w * 3 * (i * MACRO_BLOCK_DIM + k) + j * MACRO_BLOCK_DIM * 3 + p * 3 + 1] = 0;
+					frame[frame_w * 3 * (i * MACRO_BLOCK_DIM + k) + j * MACRO_BLOCK_DIM * 3 + p * 3 + 2] = color_b;
+				}
+			}
+		}
+	}
+}
+

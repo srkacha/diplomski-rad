@@ -37,7 +37,7 @@ int main(int argc, char** argv) {
 			motionVectorMatrix = calculateMotionVectorMatrix(VIDEO_W, VIDEO_H, 3, currentFrame, prevFrame, TSS_MODE, TRESHOLD_OPTIMIZATION_ON);
 			memcpy(cloneFrame, currentFrame, VIDEO_H * VIDEO_W * 3);
 			//drawRectangles(VIDEO_W, VIDEO_H, cloneFrame, motionVectorMatrix, MOVEMENT_TRESH);
-			colorMacroBlocks(VIDEO_W, VIDEO_H, cloneFrame, motionVectorMatrix);
+			colorMacroBlocksRB(VIDEO_W, VIDEO_H, cloneFrame, motionVectorMatrix);
 			//printMat(motionVectorMatrix);
 
 			// Write this frame to the output pipe
