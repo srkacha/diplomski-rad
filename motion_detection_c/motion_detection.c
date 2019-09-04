@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <math.h>
 
-char* calculateMotionVectorMatrix(int video_w, int video_h, int channels, unsigned char* currentFrame, unsigned char* prevFrame){
+char* calculateMotionVectorMatrix(int video_w, int video_h, int channels, unsigned char* currentFrame, unsigned char* prevFrame, int mode){
 	char*** mvm = allocateSpaceForMVM(video_w, video_h);
 	int result = 0;
 
@@ -13,7 +13,7 @@ char* calculateMotionVectorMatrix(int video_w, int video_h, int channels, unsign
 	//if the video frames are RGB/HSV/something other
 	}
 	else if (channels == 3) {
-		result = calculateMotionVectorMatrixRGB(video_w, video_h, currentFrame, prevFrame, mvm);
+		result = calculateMotionVectorMatrixRGB(video_w, video_h, currentFrame, prevFrame, mvm, mode);
 	}
 
 	//checking for errors
@@ -48,7 +48,7 @@ int calculateMotionVectorMatrixGrayscale(int video_w, int video_h, unsigned char
 	return 0;
 }
 
-int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, char*** mvm) {
+int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, char*** mvm, int mode) {
 	
 	//i and j are iterating through macro blocks
 	for (int i = 0; i < video_h / MACRO_BLOCK_DIM; i++) {
@@ -56,12 +56,22 @@ int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* curr
 			char offset_x = 0;
 			char offset_y = 0;
 			//todo: make if cases for optimization algs
-			calculateBlockOffsetExhaustive(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
+			if (mode == EXHAUSTIVE_MODE) {
+				calculateBlockOffsetExhaustive(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
+			}
+			else if (mode == TSS_MODE) {
+				calculateBlockOffsetTSS(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
+			}
+			else if (mode == DIAMOND_MODE) {
+				calculateBlockOffsetDiamond(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
+			}
+			else {
+				//mode not found, so we return 0 for error
+				return 0;
+			}
 			
 			mvm[i][j][0] = offset_y;
 			mvm[i][j][1] = offset_x;
-
-			//if (abs(mvm[i][j][0] + mvm[i][j][1]) > MOVEMENT_TRESH) printf("\n%d %d\n", offset_x, offset_y);
 		}
 	}
 
@@ -118,11 +128,18 @@ void calculateBlockOffsetExhaustive(int video_w, int video_h, unsigned char* cur
 	*offset_y = min_diff_row_offset;
 }
 
+void calculateBlockOffsetTSS(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y) {
+
+}
+
+void calculateBlockOffsetDiamond(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y) {
+
+}
+
 void drawRectangles(int frame_w, int frame_h, unsigned char* frame, char*** motionMatrix, float movement_tresh) {
 	for (int i = 0; i < frame_h / MACRO_BLOCK_DIM; i++) {
 		for (int j = 0; j < frame_w / MACRO_BLOCK_DIM; j++) {
 			int distance = abs(motionMatrix[i][j][0]) + abs(motionMatrix[i][j][1]);
-			//printf("\n%d %d\n", motionMatrix[i][j][0], motionMatrix[i][j][1]);
 			if (distance >= MOVEMENT_TRESH) {
 				drawRectOnBlock(frame_w, frame_h, i, j, frame);
 			}
@@ -131,7 +148,6 @@ void drawRectangles(int frame_w, int frame_h, unsigned char* frame, char*** moti
 }
 
 void drawRectOnBlock(int frame_w, int frame_h, int block_row, int block_col, unsigned char* frame) {
-	//printf("\n%d %d\n", block_row, block_col);
 	int rect_dim = MACRO_BLOCK_DIM / 2;
 	int start_row = block_row * MACRO_BLOCK_DIM + (MACRO_BLOCK_DIM - rect_dim) / 2;
 	int start_col = block_col * MACRO_BLOCK_DIM + (MACRO_BLOCK_DIM - rect_dim) / 2;
@@ -153,7 +169,6 @@ void drawRectOnBlock(int frame_w, int frame_h, int block_row, int block_col, uns
 
 int blockDidMove(int frame_w, int frame_h, int block_row, int block_col, unsigned char* current_frame,unsigned char* prev_frame) {
 	int temp_difference = 0;
-	//printf("\n%d %d\n", block_row, block_col);
 	for (int k = 0; k < MACRO_BLOCK_DIM; k++) {
 		for (int p = 0; p < MACRO_BLOCK_DIM; p++) {
 			temp_difference += (current_frame[(block_row*MACRO_BLOCK_DIM + k)*frame_w*3 + (block_col)*MACRO_BLOCK_DIM*3 + p*3 + 0] - prev_frame[(block_row * MACRO_BLOCK_DIM + k) * frame_w * 3 + (block_col)* MACRO_BLOCK_DIM * 3 + p * 3 + 0])
@@ -167,12 +182,9 @@ int blockDidMove(int frame_w, int frame_h, int block_row, int block_col, unsigne
 	}
 	
 	temp_difference /= MACRO_BLOCK_DIM * MACRO_BLOCK_DIM * 3;
-	//if (temp_difference >= 0) printf("%d\n", temp_difference);
 
 	if (temp_difference >= BLOCK_DIFF_TRESH) {
 		if (block_col == 76) {
-			//printf("\n%d %d\n", block_row, block_col);
-			//printf("%d\n", temp_difference);
 		}
 		return 1;
 	}

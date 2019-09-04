@@ -1,15 +1,20 @@
 #ifndef MOTION_DETECTION
 #define	MOTION_DETECTION
 
-#define VIDEO_W 1280
-#define VIDEO_H 720
+#define VIDEO_W 1920
+#define VIDEO_H 1080
 
 #define MACRO_BLOCK_DIM 16
 #define SEARCH_WINDOW_P 7
 
 //distance is based on the manhathan distance, that's the sum of x and y offsets
 #define MOVEMENT_TRESH 1
-#define BLOCK_DIFF_TRESH 1000
+#define BLOCK_DIFF_TRESH 500
+
+//modes for block matching implementation algorithm
+#define EXHAUSTIVE_MODE 1
+#define TSS_MODE 2
+#define DIAMOND_MODE 3
 
 /*
 All the functions expect a one dimensional representation of a frame for more optimal operations
@@ -19,7 +24,7 @@ All the functions expect a one dimensional representation of a frame for more op
 Takes two consecutive frames as input
 Returns motion vector matrix calcualted for the input frames
 */
-char* calculateMotionVectorMatrix(int video_w, int video_h, int channels, unsigned char* currentFrame, unsigned char* prevFrame);
+char* calculateMotionVectorMatrix(int video_w, int video_h, int channels, unsigned char* currentFrame, unsigned char* prevFrame, int mode);
 
 /*
 Allocates space for the output motion vector matrix
@@ -36,12 +41,22 @@ int calculateMotionVectorMatrixGrayscale(int video_w, int video_h, unsigned char
 Helper function for calculating mvm for 3 channel video (RGB, HSV...)
 Returns 1 for success, 0 for error
 */
-int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, char*** mvm);
+int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, char*** mvm, int mode);
 
 /*
-Calculating the offset for the given block on the current frame based on its position on the prev frame
+Calculating the offset for the given block on the current frame based on its position on the prev frame, exshaustive method
 */
 void calculateBlockOffsetExhaustive(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y);
+
+/*
+Three Step Search implemenatation of the block matching algorithm
+*/
+void calculateBlockOffsetTSS(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y);
+
+/*
+Diamond Search implemenatation of the block matching algorithm
+*/
+void calculateBlockOffsetDiamond(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y);
 
 /*
 Allocate space for a frame

@@ -7,12 +7,13 @@ void printMat(unsigned char*** mat);
 int main(int argc, char** argv) {
 	unsigned char* currentFrame = allocateSpaceForFrame(VIDEO_W, VIDEO_H, 3);
 	unsigned char* prevFrame = allocateSpaceForFrame(VIDEO_W, VIDEO_H, 3);
+	unsigned char* cloneFrame = allocateSpaceForFrame(VIDEO_W, VIDEO_H, 3);
 	int firstFrameReading = 1;
 	long count;
 
 
 	FILE* pipein = _popen("ffmpeg -i video/input.mp4 -f image2pipe -vcodec rawvideo -pix_fmt rgb24 -", "rb");
-	FILE* pipeout = _popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 1280x720 -r 25 -i - -f mp4 -q:v 5 -an -vcodec mpeg4 video/output.mp4", "wb");
+	FILE* pipeout = _popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 1920x1080 -r 25 -i - -f mp4 -q:v 5 -an -vcodec mpeg4 video/output.mp4", "wb");
 	
 	char*** motionVectorMatrix;
 
@@ -31,12 +32,15 @@ int main(int argc, char** argv) {
 		if (!firstFrameReading) {
 
 			// Process this frame
-			motionVectorMatrix = calculateMotionVectorMatrix(VIDEO_W, VIDEO_H, 3, currentFrame, prevFrame);
-			drawRectangles(VIDEO_W, VIDEO_H, currentFrame, motionVectorMatrix, MOVEMENT_TRESH);
+			motionVectorMatrix = calculateMotionVectorMatrix(VIDEO_W, VIDEO_H, 3, currentFrame, prevFrame, EXHAUSTIVE_MODE);
+
+			memcpy(cloneFrame, currentFrame, VIDEO_H * VIDEO_W * 3);
+
+			drawRectangles(VIDEO_W, VIDEO_H, cloneFrame, motionVectorMatrix, MOVEMENT_TRESH);
 			//printMat(motionVectorMatrix);
 
 			// Write this frame to the output pipe
-			fwrite(currentFrame, 1, VIDEO_H * VIDEO_W * 3, pipeout);
+			fwrite(cloneFrame, 1, VIDEO_H * VIDEO_W * 3, pipeout);
 		}
 		else {
 			firstFrameReading = 0;
