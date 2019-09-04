@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 		if (!firstFrameReading) {
 
 			// Process this frame
-			motionVectorMatrix = calculateMotionVectorMatrix(VIDEO_W, VIDEO_H, 3, currentFrame, prevFrame, TSS_MODE, TRESHOLD_OPTIMIZATION_OFF);
+			motionVectorMatrix = calculateMotionVectorMatrix(VIDEO_W, VIDEO_H, 3, currentFrame, prevFrame, TSS_MODE, TRESHOLD_OPTIMIZATION_ON);
 			memcpy(cloneFrame, currentFrame, VIDEO_H * VIDEO_W * 3);
 			drawRectangles(VIDEO_W, VIDEO_H, cloneFrame, motionVectorMatrix, MOVEMENT_TRESH);
 			//printMat(motionVectorMatrix);

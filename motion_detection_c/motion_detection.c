@@ -78,6 +78,8 @@ int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* curr
 			
 			mvm[i][j][0] = offset_y;
 			mvm[i][j][1] = offset_x;
+
+			//printf("\n%d %d\n", offset_x, offset_y);
 		}
 
 	}

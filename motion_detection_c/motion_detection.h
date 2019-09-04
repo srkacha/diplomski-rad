@@ -8,7 +8,7 @@
 #define SEARCH_WINDOW_P 3
 
 //distance is based on the manhathan distance, that's the sum of x and y offsets
-#define MOVEMENT_TRESH 7
+#define MOVEMENT_TRESH 1
 #define BLOCK_DIFF_TRESH 125
 
 //modes for block matching implementation algorithm
