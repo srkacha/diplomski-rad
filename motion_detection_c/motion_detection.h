@@ -1,15 +1,15 @@
 #ifndef MOTION_DETECTION
 #define	MOTION_DETECTION
 
-#define VIDEO_W 1920
-#define VIDEO_H 1080
+#define VIDEO_W 1280
+#define VIDEO_H 720
 
-#define MACRO_BLOCK_DIM 16
-#define SEARCH_WINDOW_P 7
+#define MACRO_BLOCK_DIM 8
+#define SEARCH_WINDOW_P 3
 
 //distance is based on the manhathan distance, that's the sum of x and y offsets
 #define MOVEMENT_TRESH 1
-#define BLOCK_DIFF_TRESH 500
+#define BLOCK_DIFF_TRESH 125
 
 //modes for block matching implementation algorithm
 #define EXHAUSTIVE_MODE 1

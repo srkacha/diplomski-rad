@@ -129,7 +129,60 @@ void calculateBlockOffsetExhaustive(int video_w, int video_h, unsigned char* cur
 }
 
 void calculateBlockOffsetTSS(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y) {
+	//first we check if the block did move based on the movement treshold
+	//this makes the algorithm run a lot faster because it's skipping a lot of unnecessary block matching
+	if (!blockDidMove(video_w, video_h, block_row, block_col, currentFrame, prevFrame)) return;
 
+	int min_difference = INT_MAX;
+	int min_diff_row_offset = 0;
+	int min_diff_col_offset = 0;
+	int temp_difference = 0;
+	
+	int current_frame_row = block_row * MACRO_BLOCK_DIM;
+	int current_frame_col = block_col * MACRO_BLOCK_DIM;
+
+	for (int step_size = 4; step_size > 0; step_size /= 2) {
+		for (int i = -step_size; i <= step_size; i += step_size) {
+			for (int j = -step_size; j <= step_size; j += step_size) {
+
+				//now we check if the position is valid, if it is then we do the comparation
+				if ((current_frame_row + i >= 0) && (current_frame_row + i + MACRO_BLOCK_DIM < video_h) && (current_frame_col + j >= 0) && (current_frame_row + j + MACRO_BLOCK_DIM < video_w)) {
+					temp_difference = 0;
+					for (int k = 0; k < MACRO_BLOCK_DIM; k++) {
+						for (int p = 0; p < MACRO_BLOCK_DIM; p++) {
+							temp_difference = (currentFrame[video_w * 3 * (current_frame_row + k) + (current_frame_col + p) * 3 + 0] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 0])
+								* (currentFrame[video_w * 3 * (current_frame_row + k) + (current_frame_col + p) * 3 + 0] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 0]);
+							temp_difference = (currentFrame[video_w * 3 * (current_frame_row + k) + (current_frame_col + p) * 3 + 1] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 1])
+								* (currentFrame[video_w * 3 * (current_frame_row + k) + (current_frame_col + p) * 3 + 1] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 1]);
+							temp_difference = (currentFrame[video_w * 3 * (current_frame_row + k) + (current_frame_col + p) * 3 + 2] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 2])
+								* (currentFrame[video_w * 3 * (current_frame_row + k) + (current_frame_col + p) * 3 + 2] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 2]);
+						}
+					}
+
+					temp_difference /= MACRO_BLOCK_DIM * MACRO_BLOCK_DIM * 3;
+
+					if (temp_difference < min_difference) {
+						min_diff_row_offset = i;
+						min_diff_col_offset = j;
+						min_difference = temp_difference;
+					}
+				}
+			}
+		}
+		//now we can change the current frame position
+		current_frame_row += min_diff_row_offset;
+		current_frame_col += min_diff_col_offset;
+
+		min_diff_col_offset = 0;
+		min_diff_row_offset = 0;
+		min_difference = INT_MAX;
+	}
+
+	//we set the output values
+	int old_current_row = block_row * MACRO_BLOCK_DIM;
+	int old_current_col = block_col * MACRO_BLOCK_DIM;
+	*offset_x = old_current_col - current_frame_col;
+	*offset_y = old_current_row - current_frame_row;
 }
 
 void calculateBlockOffsetDiamond(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y) {

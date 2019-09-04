@@ -13,7 +13,7 @@ int main(int argc, char** argv) {
 
 
 	FILE* pipein = _popen("ffmpeg -i video/input.mp4 -f image2pipe -vcodec rawvideo -pix_fmt rgb24 -", "rb");
-	FILE* pipeout = _popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 1920x1080 -r 25 -i - -f mp4 -q:v 5 -an -vcodec mpeg4 video/output.mp4", "wb");
+	FILE* pipeout = _popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 1280x720 -r 25 -i - -f mp4 -q:v 5 -an -vcodec mpeg4 video/output.mp4", "wb");
 	
 	char*** motionVectorMatrix;
 
@@ -32,7 +32,7 @@ int main(int argc, char** argv) {
 		if (!firstFrameReading) {
 
 			// Process this frame
-			motionVectorMatrix = calculateMotionVectorMatrix(VIDEO_W, VIDEO_H, 3, currentFrame, prevFrame, EXHAUSTIVE_MODE);
+			motionVectorMatrix = calculateMotionVectorMatrix(VIDEO_W, VIDEO_H, 3, currentFrame, prevFrame, TSS_MODE);
 
 			memcpy(cloneFrame, currentFrame, VIDEO_H * VIDEO_W * 3);
 
