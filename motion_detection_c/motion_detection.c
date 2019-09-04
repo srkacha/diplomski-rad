@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <math.h>
 
-char* calculateMotionVectorMatrix(int video_w, int video_h, int channels, unsigned char* currentFrame, unsigned char* prevFrame, int mode){
+
+char*** calculateMotionVectorMatrix(int video_w, int video_h, int channels, unsigned char* currentFrame, unsigned char* prevFrame, int mode, int treshold_optimization){
 	char*** mvm = allocateSpaceForMVM(video_w, video_h);
 	int result = 0;
 
@@ -13,7 +14,7 @@ char* calculateMotionVectorMatrix(int video_w, int video_h, int channels, unsign
 	//if the video frames are RGB/HSV/something other
 	}
 	else if (channels == 3) {
-		result = calculateMotionVectorMatrixRGB(video_w, video_h, currentFrame, prevFrame, mvm, mode);
+		result = calculateMotionVectorMatrixRGB(video_w, video_h, currentFrame, prevFrame, mvm, mode, treshold_optimization);
 	}
 
 	//checking for errors
@@ -48,31 +49,37 @@ int calculateMotionVectorMatrixGrayscale(int video_w, int video_h, unsigned char
 	return 0;
 }
 
-int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, char*** mvm, int mode) {
-	
+int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, char*** mvm, int mode, int treshold_optimization) {
+
 	//i and j are iterating through macro blocks
 	for (int i = 0; i < video_h / MACRO_BLOCK_DIM; i++) {
 		for (int j = 0; j < video_w / MACRO_BLOCK_DIM; j++) {
 			char offset_x = 0;
 			char offset_y = 0;
-			//todo: make if cases for optimization algs
-			if (mode == EXHAUSTIVE_MODE) {
-				calculateBlockOffsetExhaustive(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
-			}
-			else if (mode == TSS_MODE) {
-				calculateBlockOffsetTSS(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
-			}
-			else if (mode == DIAMOND_MODE) {
-				calculateBlockOffsetDiamond(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
-			}
-			else {
-				//mode not found, so we return 0 for error
-				return 0;
+
+			//first we check if the block did move based on the movement treshold
+			//this makes the algorithm run a lot faster because it's skipping a lot of unnecessary block matching
+			if ((treshold_optimization && blockDidMove(video_w, video_h, i, j, currentFrame, prevFrame)) || !treshold_optimization) {
+				if (mode == EXHAUSTIVE_MODE) {
+					calculateBlockOffsetExhaustive(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
+					
+				}
+				else if (mode == TSS_MODE) {
+					calculateBlockOffsetTSS(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
+				}
+				else if (mode == DIAMOND_MODE) {
+					calculateBlockOffsetDiamond(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
+				}
+				else {
+					//mode not found, so we return 0 for error
+					return 0;
+				}
 			}
 			
 			mvm[i][j][0] = offset_y;
 			mvm[i][j][1] = offset_x;
 		}
+
 	}
 
 	return 1;
@@ -80,12 +87,7 @@ int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* curr
 
 
 void calculateBlockOffsetExhaustive(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y) {
-	//first we check if the block did move based on the movement treshold
-	//this makes the algorithm run a lot faster because it's skipping a lot of unnecessary block matching
-	if (!blockDidMove(video_w, video_h, block_row, block_col, currentFrame, prevFrame)) return;
-	
 	//first we need to calculate the window size
-	
 	int start_px_row = ((block_row * MACRO_BLOCK_DIM )- SEARCH_WINDOW_P <=0 ) ? 0 : (block_row * MACRO_BLOCK_DIM) - SEARCH_WINDOW_P;
 	int start_px_col = ((block_col * MACRO_BLOCK_DIM) - SEARCH_WINDOW_P <= 0) ? 0 : (block_col * MACRO_BLOCK_DIM) - SEARCH_WINDOW_P;
 	int end_px_row = ((block_row * MACRO_BLOCK_DIM) + MACRO_BLOCK_DIM + SEARCH_WINDOW_P >= video_h) ? video_h - MACRO_BLOCK_DIM : (block_row * MACRO_BLOCK_DIM) + SEARCH_WINDOW_P;
@@ -129,10 +131,6 @@ void calculateBlockOffsetExhaustive(int video_w, int video_h, unsigned char* cur
 }
 
 void calculateBlockOffsetTSS(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y) {
-	//first we check if the block did move based on the movement treshold
-	//this makes the algorithm run a lot faster because it's skipping a lot of unnecessary block matching
-	if (!blockDidMove(video_w, video_h, block_row, block_col, currentFrame, prevFrame)) return;
-
 	int min_difference = INT_MAX;
 	int min_diff_row_offset = 0;
 	int min_diff_col_offset = 0;

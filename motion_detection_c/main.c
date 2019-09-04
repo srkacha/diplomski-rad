@@ -1,8 +1,9 @@
 #include "motion_detection.h"
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
-void printMat(unsigned char*** mat);
+void printMat(char*** mat);
 
 int main(int argc, char** argv) {
 	unsigned char* currentFrame = allocateSpaceForFrame(VIDEO_W, VIDEO_H, 3);
@@ -12,8 +13,9 @@ int main(int argc, char** argv) {
 	long count;
 
 
+
 	FILE* pipein = _popen("ffmpeg -i video/input.mp4 -f image2pipe -vcodec rawvideo -pix_fmt rgb24 -", "rb");
-	FILE* pipeout = _popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 1280x720 -r 25 -i - -f mp4 -q:v 5 -an -vcodec mpeg4 video/output.mp4", "wb");
+	FILE* pipeout = _popen("ffmpeg -y -f rawvideo -vcodec rawvideo -pix_fmt rgb24 -s 1920x1080 -r 25 -i - -f mp4 -q:v 5 -an -vcodec mpeg4 video/output.mp4", "wb");
 	
 	char*** motionVectorMatrix;
 
@@ -32,10 +34,8 @@ int main(int argc, char** argv) {
 		if (!firstFrameReading) {
 
 			// Process this frame
-			motionVectorMatrix = calculateMotionVectorMatrix(VIDEO_W, VIDEO_H, 3, currentFrame, prevFrame, TSS_MODE);
-
+			motionVectorMatrix = calculateMotionVectorMatrix(VIDEO_W, VIDEO_H, 3, currentFrame, prevFrame, TSS_MODE, TRESHOLD_OPTIMIZATION_OFF);
 			memcpy(cloneFrame, currentFrame, VIDEO_H * VIDEO_W * 3);
-
 			drawRectangles(VIDEO_W, VIDEO_H, cloneFrame, motionVectorMatrix, MOVEMENT_TRESH);
 			//printMat(motionVectorMatrix);
 
