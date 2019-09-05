@@ -125,4 +125,9 @@ Convert the color frame array representation to a one byte per pixel grayscale r
 */
 unsigned char* convertRGBtoGray(int frame_w, int frame_h, unsigned char* color_frame);
 
+/*
+Free space alocated for motion vector matrix
+*/
+void freeMotionVectorMatrix(int frame_h, int frame_w, char*** mvm);
+
 #endif

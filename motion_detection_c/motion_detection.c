@@ -77,6 +77,7 @@ int calculateMotionVectorMatrixGrayscale(int video_w, int video_h, unsigned char
 			//first we check if the block did move based on the movement treshold
 			//this makes the algorithm run a lot faster because it's skipping a lot of unnecessary block matching
 			if ((treshold_optimization && blockDidMoveGray(video_w, video_h, i, j, current_frame_gray, prev_frame_gray)) || !treshold_optimization) {
+			
 				if (mode == SEARCH_MODE_EXHAUSTIVE) {
 					calculateBlockOffsetExhaustiveGray(video_w, video_h, current_frame_gray, prev_frame_gray, i, j, &offset_x, &offset_y);
 				}
@@ -95,8 +96,10 @@ int calculateMotionVectorMatrixGrayscale(int video_w, int video_h, unsigned char
 			mvm[i][j][0] = offset_y;
 			mvm[i][j][1] = offset_x;
 		}
-
 	}
+
+	free(current_frame_gray);
+	free(prev_frame_gray);
 
 	return 1;
 }
@@ -112,6 +115,7 @@ int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* curr
 			//first we check if the block did move based on the movement treshold
 			//this makes the algorithm run a lot faster because it's skipping a lot of unnecessary block matching
 			if ((treshold_optimization && blockDidMove(video_w, video_h, i, j, currentFrame, prevFrame)) || !treshold_optimization) {
+				
 				if (mode == SEARCH_MODE_EXHAUSTIVE) {
 					calculateBlockOffsetExhaustive(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
 					
@@ -594,5 +598,15 @@ void colorMacroBlocksRB(int frame_w, int frame_h, unsigned char* frame, char*** 
 			}
 		}
 	}
+}
+
+void freeMotionVectorMatrix(int frame_h, int frame_w, char*** mvm) {
+	for (int i = 0; i < frame_h / MACRO_BLOCK_DIM; i++) {
+		for (int j = 0; j < frame_w / MACRO_BLOCK_DIM; j++) {
+			free(mvm[i][j]);
+		}
+		free(mvm[i]);
+	}
+	free(mvm);
 }
 

@@ -40,6 +40,9 @@ int main(int argc, char** argv) {
 			//colorMacroBlocksRB(VIDEO_W, VIDEO_H, cloneFrame, motionVectorMatrix);
 			//printMat(motionVectorMatrix);
 
+			//freeing the motion vector matrix space
+			freeMotionVectorMatrix(VIDEO_H, VIDEO_W, motionVectorMatrix);
+
 			// Write this frame to the output pipe
 			fwrite(cloneFrame, 1, VIDEO_H * VIDEO_W * 3, pipeout);
 		}
@@ -47,6 +50,11 @@ int main(int argc, char** argv) {
 			firstFrameReading = 0;
 		}
 	}
+
+	//free the space allocated for frames
+	free(currentFrame);
+	free(prevFrame);
+	free(cloneFrame);
 
 	// Flush and close input and output pipes
 	fflush(pipein);
