@@ -1,13 +1,7 @@
 ﻿  main.c
-  motion_detection.c
-C:\Users\sjovic\Desktop\repos\diplomski rad\diplomski-rad\motion_detection_c\motion_detection.c(315,204): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\sjovic\Desktop\repos\diplomski rad\diplomski-rad\motion_detection_c\motion_detection.c(317,204): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\sjovic\Desktop\repos\diplomski rad\diplomski-rad\motion_detection_c\motion_detection.c(319,204): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\sjovic\Desktop\repos\diplomski rad\diplomski-rad\motion_detection_c\motion_detection.c(349,27): warning C4305:  '=': truncation from 'int' to 'float'
-C:\Users\sjovic\Desktop\repos\diplomski rad\diplomski-rad\motion_detection_c\motion_detection.c(285,1): warning C4305:  'initializing': truncation from 'int' to 'float'
 Release\motion_detection.obj : warning LNK4042: object specified more than once; extras ignored
   Generating code
-  2 of 15 functions (13.3%) were compiled, the rest were copied from previous compilation.
+  2 of 16 functions (12.5%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
     0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code

@@ -47,7 +47,7 @@ char*** allocateSpaceForMVM(int video_w, int video_h);
 Helper function for calculating mvm for 1 channel video (grayscale)
 Returns 1 for success, 0 for error
 */
-int calculateMotionVectorMatrixGrayscale(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, char*** mvm, int mode);
+int calculateMotionVectorMatrixGrayscale(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, char*** mvm, int mode, int treshold_optimization);
 
 /*
 Helper function for calculating mvm for 3 channel video (RGB, HSV...)

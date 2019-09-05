@@ -10,7 +10,7 @@ char*** calculateMotionVectorMatrix(int video_w, int video_h, int color_mode, un
 
 	//if the video frames are grayscale
 	if (color_mode == GRAYSCALE_MODE) {
-		result = calculateMotionVectorMatrixGrayscale(video_w, video_h, currentFrame, prevFrame, mvm, mode);
+		result = calculateMotionVectorMatrixGrayscale(video_w, video_h, currentFrame, prevFrame, mvm, mode, treshold_optimization);
 	//if the video frames are RGB/HSV/something other
 	}
 	else if (color_mode == RGB_MODE) {
@@ -63,7 +63,7 @@ unsigned char* convertRGBtoGray(int frame_w, int frame_h, unsigned char* color_f
 	return gray_frame;
 }
 
-int calculateMotionVectorMatrixGrayscale(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, char*** mvm, int mode) {
+int calculateMotionVectorMatrixGrayscale(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, char*** mvm, int mode, int treshold_optimization) {
 	//first we convert the frames to grayscale
 	unsigned char* current_frame_gray = convertRGBtoGray(video_w, video_h, currentFrame);
 	unsigned char* prev_frame_gray = convertRGBtoGray(video_w, video_h, prevFrame);
@@ -76,23 +76,23 @@ int calculateMotionVectorMatrixGrayscale(int video_w, int video_h, unsigned char
 
 			//first we check if the block did move based on the movement treshold
 			//this makes the algorithm run a lot faster because it's skipping a lot of unnecessary block matching
-			
-			if (mode == EXHAUSTIVE_MODE) {
-				calculateBlockOffsetExhaustiveGray(video_w, video_h, current_frame_gray, prev_frame_gray, i, j, &offset_x, &offset_y);
+			if ((treshold_optimization && blockDidMoveGray(video_w, video_h, i, j, current_frame_gray, prev_frame_gray)) || !treshold_optimization) {
+				if (mode == EXHAUSTIVE_MODE) {
+					calculateBlockOffsetExhaustiveGray(video_w, video_h, current_frame_gray, prev_frame_gray, i, j, &offset_x, &offset_y);
+				}
+				else if (mode == TSS_MODE) {
+					//todo: implement this shit
+					return 0;
+				}
+				else if (mode == DIAMOND_MODE) {
+					//todo: implement this shit
+					return 0;
+				}
+				else {
+					//mode not found, so we return 0 for error
+					return 0;
+				}
 			}
-			else if (mode == TSS_MODE) {
-				//todo: implement this shit
-				return 0;
-			}
-			else if (mode == DIAMOND_MODE) {
-				//todo: implement this shit
-				return 0;
-			}
-			else {
-				//mode not found, so we return 0 for error
-				return 0;
-			}
-			
 
 			mvm[i][j][0] = offset_y;
 			mvm[i][j][1] = offset_x;
@@ -420,7 +420,7 @@ int blockDidMoveGray(int frame_w, int frame_h, int block_row, int block_col, uns
 	for (int k = 0; k < MACRO_BLOCK_DIM; k++) {
 		for (int p = 0; p < MACRO_BLOCK_DIM; p++) {
 			temp_difference += (current_frame[(block_row * MACRO_BLOCK_DIM + k) * frame_w + (block_col)* MACRO_BLOCK_DIM  + p  + 0] - prev_frame[(block_row * MACRO_BLOCK_DIM + k) * frame_w  + (block_col)* MACRO_BLOCK_DIM  + p  + 0])
-				* (current_frame[(block_row * MACRO_BLOCK_DIM + k) * frame_w * 3 + (block_col)* MACRO_BLOCK_DIM * 3 + p * 3 + 0] - prev_frame[(block_row * MACRO_BLOCK_DIM + k) * frame_w  + (block_col)* MACRO_BLOCK_DIM * 3 + p  + 0]);
+				* (current_frame[(block_row * MACRO_BLOCK_DIM + k) * frame_w + (block_col)* MACRO_BLOCK_DIM + p + 0] - prev_frame[(block_row * MACRO_BLOCK_DIM + k) * frame_w  + (block_col)* MACRO_BLOCK_DIM + p  + 0]);
 		}
 	}
 
