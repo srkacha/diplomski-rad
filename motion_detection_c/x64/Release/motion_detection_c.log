@@ -1,0 +1,15 @@
+﻿  main.c
+  motion_detection.c
+C:\Users\Jova\Desktop\Diplomski rad\diplomski-rad\motion_detection_c\main.c(29,64): warning C4267:  '=': conversion from 'size_t' to 'long', possible loss of data
+C:\Users\Jova\Desktop\Diplomski rad\diplomski-rad\motion_detection_c\motion_detection.c(315,204): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Jova\Desktop\Diplomski rad\diplomski-rad\motion_detection_c\motion_detection.c(317,204): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Jova\Desktop\Diplomski rad\diplomski-rad\motion_detection_c\motion_detection.c(319,204): warning C4244:  '=': conversion from 'int' to 'float', possible loss of data
+C:\Users\Jova\Desktop\Diplomski rad\diplomski-rad\motion_detection_c\motion_detection.c(349,27): warning C4305:  '=': truncation from 'int' to 'float'
+C:\Users\Jova\Desktop\Diplomski rad\diplomski-rad\motion_detection_c\motion_detection.c(285,1): warning C4305:  'initializing': truncation from 'int' to 'float'
+x64\Release\motion_detection.obj : warning LNK4042: object specified more than once; extras ignored
+  Generating code
+  0 of 16 functions ( 0.0%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    0 functions had inline decision re-evaluated but remain unchanged
+  Finished generating code
+  motion_detection_c.vcxproj -> C:\Users\Jova\Desktop\Diplomski rad\diplomski-rad\motion_detection_c\x64\Release\motion_detection_c.exe

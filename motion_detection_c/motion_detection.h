@@ -9,24 +9,24 @@
 
 //distance is based on the manhathan distance, that's the sum of x and y offsets
 #define MOVEMENT_TRESH 7
-#define BLOCK_DIFF_TRESH 125
+#define BLOCK_SIMILARITY_TRESH 125
 
 //modes for block matching implementation algorithm
-#define EXHAUSTIVE_MODE 1
-#define TSS_MODE 2
-#define DIAMOND_MODE 3
+#define SEARCH_MODE_EXHAUSTIVE 1
+#define SEARCH_MODE_TSS 2
+#define SEARCH_MODE_DIAMOND 3
 
 
 //if set to 0 then there is no limit
-#define DIAMOND_MODE_RECURSION_DEPTH_LIMIT 5
+#define SEARCH_MODE_DIAMOND_RECURSION_DEPTH_LIMIT 5
 
 //modes for treshold potimization
-#define TRESHOLD_OPTIMIZATION_ON 1
-#define TRESHOLD_OPTIMIZATION_OFF 0
+#define BLOCK_SIMILARITY_OPTIMIZATION_ON 1
+#define BLOCK_SIMILARITY_OPTIMIZATION_OFF 0
 
 //color modes for the algorithm
-#define RGB_MODE 1
-#define GRAYSCALE_MODE 2
+#define COLOR_MODE_RGB 1
+#define COLOR_MODE_GRAY 2
 
 /*
 All the functions expect a one dimensional representation of a frame for more optimal operations

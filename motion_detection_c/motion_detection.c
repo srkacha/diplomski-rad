@@ -9,11 +9,11 @@ char*** calculateMotionVectorMatrix(int video_w, int video_h, int color_mode, un
 	int result = 0;
 
 	//if the video frames are grayscale
-	if (color_mode == GRAYSCALE_MODE) {
+	if (color_mode == COLOR_MODE_GRAY) {
 		result = calculateMotionVectorMatrixGrayscale(video_w, video_h, currentFrame, prevFrame, mvm, mode, treshold_optimization);
 	//if the video frames are RGB/HSV/something other
 	}
-	else if (color_mode == RGB_MODE) {
+	else if (color_mode == COLOR_MODE_RGB) {
 		result = calculateMotionVectorMatrixRGB(video_w, video_h, currentFrame, prevFrame, mvm, mode, treshold_optimization);
 	}
 
@@ -77,14 +77,14 @@ int calculateMotionVectorMatrixGrayscale(int video_w, int video_h, unsigned char
 			//first we check if the block did move based on the movement treshold
 			//this makes the algorithm run a lot faster because it's skipping a lot of unnecessary block matching
 			if ((treshold_optimization && blockDidMoveGray(video_w, video_h, i, j, current_frame_gray, prev_frame_gray)) || !treshold_optimization) {
-				if (mode == EXHAUSTIVE_MODE) {
+				if (mode == SEARCH_MODE_EXHAUSTIVE) {
 					calculateBlockOffsetExhaustiveGray(video_w, video_h, current_frame_gray, prev_frame_gray, i, j, &offset_x, &offset_y);
 				}
-				else if (mode == TSS_MODE) {
+				else if (mode == SEARCH_MODE_TSS) {
 					//todo: implement this shit
 					return 0;
 				}
-				else if (mode == DIAMOND_MODE) {
+				else if (mode == SEARCH_MODE_DIAMOND) {
 					//todo: implement this shit
 					return 0;
 				}
@@ -114,14 +114,14 @@ int calculateMotionVectorMatrixRGB(int video_w, int video_h, unsigned char* curr
 			//first we check if the block did move based on the movement treshold
 			//this makes the algorithm run a lot faster because it's skipping a lot of unnecessary block matching
 			if ((treshold_optimization && blockDidMove(video_w, video_h, i, j, currentFrame, prevFrame)) || !treshold_optimization) {
-				if (mode == EXHAUSTIVE_MODE) {
+				if (mode == SEARCH_MODE_EXHAUSTIVE) {
 					calculateBlockOffsetExhaustive(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
 					
 				}
-				else if (mode == TSS_MODE) {
+				else if (mode == SEARCH_MODE_TSS) {
 					calculateBlockOffsetTSS(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
 				}
-				else if (mode == DIAMOND_MODE) {
+				else if (mode == SEARCH_MODE_DIAMOND) {
 					calculateBlockOffsetDiamond(video_w, video_h, currentFrame, prevFrame, i, j, &offset_x, &offset_y);
 				}
 				else {
@@ -353,7 +353,7 @@ void calculateBlockOffsetDiamond(int video_w, int video_h, unsigned char* curren
 
 		//now we check if the recursion depth limit is reached, if there is a limit
 		//0 value means there is no limit
-		if (DIAMOND_MODE_RECURSION_DEPTH_LIMIT && steps == DIAMOND_MODE_RECURSION_DEPTH_LIMIT) {
+		if (SEARCH_MODE_DIAMOND_RECURSION_DEPTH_LIMIT && steps == SEARCH_MODE_DIAMOND_RECURSION_DEPTH_LIMIT) {
 			diamond_recursion_done = 1;
 		}
 	}
@@ -412,7 +412,7 @@ int blockDidMove(int frame_w, int frame_h, int block_row, int block_col, unsigne
 	
 	temp_difference /= MACRO_BLOCK_DIM * MACRO_BLOCK_DIM * 3;
 
-	return temp_difference > BLOCK_DIFF_TRESH;
+	return temp_difference > BLOCK_SIMILARITY_TRESH;
 }
 
 int blockDidMoveGray(int frame_w, int frame_h, int block_row, int block_col, unsigned char* current_frame, unsigned char* prev_frame) {
@@ -426,7 +426,7 @@ int blockDidMoveGray(int frame_w, int frame_h, int block_row, int block_col, uns
 
 	temp_difference /= MACRO_BLOCK_DIM * MACRO_BLOCK_DIM;
 
-	return temp_difference > BLOCK_DIFF_TRESH;
+	return temp_difference > BLOCK_SIMILARITY_TRESH;
 }
 
 void colorMacroBlocks(int frame_w, int frame_h, unsigned char* frame, char*** motionMatrix) {
