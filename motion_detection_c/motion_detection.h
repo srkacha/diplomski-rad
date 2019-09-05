@@ -8,13 +8,17 @@
 #define SEARCH_WINDOW_P 7
 
 //distance is based on the manhathan distance, that's the sum of x and y offsets
-#define MOVEMENT_TRESH 1
+#define MOVEMENT_TRESH 3
 #define BLOCK_DIFF_TRESH 125
 
 //modes for block matching implementation algorithm
 #define EXHAUSTIVE_MODE 1
 #define TSS_MODE 2
 #define DIAMOND_MODE 3
+
+
+//if set to 0 then there is no limit
+#define DIAMOND_MODE_RECURSION_DEPTH_LIMIT 5
 
 //modes for treshold potimization
 #define TRESHOLD_OPTIMIZATION_ON 1

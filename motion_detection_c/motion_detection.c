@@ -141,6 +141,9 @@ void calculateBlockOffsetTSS(int video_w, int video_h, unsigned char* currentFra
 	int current_frame_row = block_row * MACRO_BLOCK_DIM;
 	int current_frame_col = block_col * MACRO_BLOCK_DIM;
 
+	int current_frame_fixed_row = current_frame_row;
+	int current_frame_fixed_col = current_frame_col;
+
 	for (int step_size = 4; step_size > 0; step_size /= 2) {
 		for (int i = -step_size; i <= step_size; i += step_size) {
 			for (int j = -step_size; j <= step_size; j += step_size) {
@@ -150,12 +153,12 @@ void calculateBlockOffsetTSS(int video_w, int video_h, unsigned char* currentFra
 					temp_difference = 0;
 					for (int k = 0; k < MACRO_BLOCK_DIM; k++) {
 						for (int p = 0; p < MACRO_BLOCK_DIM; p++) {
-							temp_difference = (currentFrame[video_w * 3 * (current_frame_row + k) + (current_frame_col + p) * 3 + 0] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 0])
-								* (currentFrame[video_w * 3 * (current_frame_row + k) + (current_frame_col + p) * 3 + 0] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 0]);
-							temp_difference = (currentFrame[video_w * 3 * (current_frame_row + k) + (current_frame_col + p) * 3 + 1] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 1])
-								* (currentFrame[video_w * 3 * (current_frame_row + k) + (current_frame_col + p) * 3 + 1] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 1]);
-							temp_difference = (currentFrame[video_w * 3 * (current_frame_row + k) + (current_frame_col + p) * 3 + 2] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 2])
-								* (currentFrame[video_w * 3 * (current_frame_row + k) + (current_frame_col + p) * 3 + 2] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 2]);
+							temp_difference = (currentFrame[video_w * 3 * (current_frame_fixed_row + k) + (current_frame_fixed_col + p) * 3 + 0] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 0])
+								* (currentFrame[video_w * 3 * (current_frame_fixed_row + k) + (current_frame_fixed_col + p) * 3 + 0] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 0]);
+							temp_difference = (currentFrame[video_w * 3 * (current_frame_fixed_row + k) + (current_frame_fixed_col + p) * 3 + 1] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 1])
+								* (currentFrame[video_w * 3 * (current_frame_fixed_row + k) + (current_frame_fixed_col + p) * 3 + 1] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 1]);
+							temp_difference = (currentFrame[video_w * 3 * (current_frame_fixed_row + k) + (current_frame_fixed_col + p) * 3 + 2] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 2])
+								* (currentFrame[video_w * 3 * (current_frame_fixed_row + k) + (current_frame_fixed_col + p) * 3 + 2] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 2]);
 						}
 					}
 
@@ -186,7 +189,87 @@ void calculateBlockOffsetTSS(int video_w, int video_h, unsigned char* currentFra
 }
 
 void calculateBlockOffsetDiamond(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y) {
+	float min_difference = INT_MAX;
+	int min_diff_row_offset = 0;
+	int min_diff_col_offset = 0;
+	float temp_difference = 0;
 
+	int current_frame_row = block_row * MACRO_BLOCK_DIM;
+	int current_frame_col = block_col * MACRO_BLOCK_DIM;
+
+	int current_frame_fixed_row = current_frame_row;
+	int current_frame_fixed_col = current_frame_col;
+
+	int step_size = 2;
+	int diamond_recursion_done = 0;
+
+	//needed for the recursion depth limit
+	int steps = 0;
+
+	while (diamond_recursion_done == 0) {
+		//we run this block of code until we find the match in the center on one of the recursion diamonds
+
+		for (int i = -step_size; i <= step_size; i++) {
+			for (int j = -step_size; j <= step_size; j++) {
+				//check if the coordinates match the diamond pattern
+				if (abs(i) + abs(j) == step_size || (i == 0 && j == 0)) {
+					// now we check if the position is valid, if it is then we do the comparation
+					if ((current_frame_row + i >= 0) && (current_frame_row + i + MACRO_BLOCK_DIM < video_h) && (current_frame_col + j >= 0) && (current_frame_row + j + MACRO_BLOCK_DIM < video_w)) {
+						temp_difference = 0;
+						for (int k = 0; k < MACRO_BLOCK_DIM; k++) {
+							for (int p = 0; p < MACRO_BLOCK_DIM; p++) {
+								temp_difference = (currentFrame[video_w * 3 * (current_frame_fixed_row + k) + (current_frame_fixed_col + p) * 3 + 0] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 0])
+									* (currentFrame[video_w * 3 * (current_frame_fixed_row + k) + (current_frame_fixed_col + p) * 3 + 0] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 0]);
+								temp_difference = (currentFrame[video_w * 3 * (current_frame_fixed_row + k) + (current_frame_fixed_col + p) * 3 + 1] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 1])
+									* (currentFrame[video_w * 3 * (current_frame_fixed_row + k) + (current_frame_fixed_col + p) * 3 + 1] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 1]);
+								temp_difference = (currentFrame[video_w * 3 * (current_frame_fixed_row + k) + (current_frame_fixed_col + p) * 3 + 2] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 2])
+									* (currentFrame[video_w * 3 * (current_frame_fixed_row + k) + (current_frame_fixed_col + p) * 3 + 2] - prevFrame[video_w * 3 * (current_frame_row + i + k) + (current_frame_col + j + p) * 3 + 2]);
+							}
+						}
+
+						temp_difference /= (float)(MACRO_BLOCK_DIM * MACRO_BLOCK_DIM * 3);
+
+						if (temp_difference < min_difference) {
+							min_diff_row_offset = i;
+							min_diff_col_offset = j;
+							min_difference = temp_difference;
+						}
+					}
+				}
+			}
+		}
+		
+		//now we can change the current frame position
+		current_frame_row += min_diff_row_offset;
+		current_frame_col += min_diff_col_offset;
+
+		//if this was the big diamond pattern, we make the next one small
+		if (step_size == 2) {
+			step_size = 1;
+		}
+		else if(min_diff_col_offset == 0 && min_diff_row_offset == 0) { // this means we found the best match in the center of the diamond so we stop the algorithm
+			diamond_recursion_done = 1;
+		}
+
+		min_diff_col_offset = 0;
+		min_diff_row_offset = 0;
+		min_difference = INT_MAX;
+
+		//increase the step counter after a full cycle
+		steps += 1;
+
+		//now we check if the recursion depth limit is reached, if there is a limit
+		//0 value means there is no limit
+		if (DIAMOND_MODE_RECURSION_DEPTH_LIMIT && steps == DIAMOND_MODE_RECURSION_DEPTH_LIMIT) {
+			diamond_recursion_done = 1;
+		}
+	}
+
+	//we set the output values
+	int old_current_row = block_row * MACRO_BLOCK_DIM;
+	int old_current_col = block_col * MACRO_BLOCK_DIM;
+	*offset_x = old_current_col - current_frame_col;
+	*offset_y = old_current_row - current_frame_row;
 }
 
 void drawRectangles(int frame_w, int frame_h, unsigned char* frame, char*** motionMatrix, float movement_tresh) {
