@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 		if (!firstFrameReading) {
 
 			// Process this frame
-			motionVectorMatrix = calculateMotionVectorMatrix(VIDEO_W, VIDEO_H, COLOR_MODE_GRAY, currentFrame, prevFrame, SEARCH_MODE_EXHAUSTIVE, BLOCK_SIMILARITY_OPTIMIZATION_ON);
+			motionVectorMatrix = calculateMotionVectorMatrix(VIDEO_W, VIDEO_H, COLOR_MODE_GRAY, currentFrame, prevFrame, SEARCH_MODE_TSS, BLOCK_SIMILARITY_OPTIMIZATION_ON);
 			memcpy(cloneFrame, currentFrame, VIDEO_H * VIDEO_W * 3);
 			drawRectangles(VIDEO_W, VIDEO_H, cloneFrame, motionVectorMatrix, MOVEMENT_TRESH);
 			//colorMacroBlocksRB(VIDEO_W, VIDEO_H, cloneFrame, motionVectorMatrix);

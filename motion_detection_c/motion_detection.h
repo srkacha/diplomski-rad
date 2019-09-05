@@ -18,7 +18,7 @@
 
 
 //if set to 0 then there is no limit
-#define SEARCH_MODE_DIAMOND_RECURSION_DEPTH_LIMIT 5
+#define SEARCH_MODE_DIAMOND_RECURSION_DEPTH_LIMIT 0
 
 //modes for treshold potimization
 #define BLOCK_SIMILARITY_OPTIMIZATION_ON 1
@@ -71,9 +71,19 @@ Three Step Search implemenatation of the block matching algorithm
 void calculateBlockOffsetTSS(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y);
 
 /*
+Three Step Search implemenatation of the block matching algorithm, for grayscale implementation
+*/
+void calculateBlockOffsetTSSGray(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y);
+
+/*
 Diamond Search implemenatation of the block matching algorithm
 */
 void calculateBlockOffsetDiamond(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y);
+
+/*
+Diamond Search implemenatation of the block matching algorithm, for grayscale implementation
+*/
+void calculateBlockOffsetDiamondGray(int video_w, int video_h, unsigned char* currentFrame, unsigned char* prevFrame, int block_row, int block_col, char* offset_x, char* offset_y);
 
 /*
 Allocate space for a frame
